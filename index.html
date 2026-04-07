@@ -300,6 +300,79 @@
     font-size:14px;
     color: var(--text);
   }
+  .revealBlock{
+    margin-top:16px;
+    border-top:1px dashed rgba(120,255,210,0.22);
+    padding-top:14px;
+    display:none;
+  }
+  .revealLabel{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    color:rgba(225,255,245,0.55);
+    margin-bottom:8px;
+  }
+  .revealPhoto{
+    width:100%;
+    aspect-ratio:16/9;
+    border:1px dashed rgba(120,255,210,0.28);
+    background: repeating-linear-gradient(
+      45deg,
+      rgba(120,255,210,0.03),
+      rgba(120,255,210,0.03) 1px,
+      transparent 1px,
+      transparent 14px
+    );
+    display:grid;
+    place-items:center;
+    position:relative;
+    overflow:hidden;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    color:rgba(225,255,245,0.45);
+    text-align:center;
+    padding:10px;
+  }
+  .revealPhoto img{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  }
+  .revealPhotoCaption{
+    margin-top:6px;
+    font-size:11px;
+    color:rgba(225,255,245,0.45);
+    text-transform:uppercase;
+    letter-spacing:0.4px;
+  }
+  .revealAudio{
+    margin-top:12px;
+  }
+  .revealAudioLabel{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    color:rgba(225,255,245,0.55);
+    margin-bottom:6px;
+  }
+  .revealAudio audio{
+    width:100%;
+    filter: grayscale(1) contrast(1.1);
+  }
+  .slipNote{
+    margin-top:10px;
+    border:1px dashed rgba(255,210,130,0.35);
+    padding:10px;
+    background: rgba(255,210,130,0.05);
+    font-size:12px;
+    color:rgba(255,210,130,0.92);
+    line-height:1.6;
+    white-space:pre-wrap;
+  }
   .cursor{
     display:inline-block;
     width:10px;
@@ -372,10 +445,36 @@ replace the empty file names when you add your own sounds.</p>
 <div class="modalBack" id="modalBack" aria-hidden="true">
   <div class="modal" role="dialog" aria-modal="true">
     <div class="mHead">
-      <p class="mTitle">DOCUMENT // PRINTED</p>
+      <p class="mTitle">VOICEMAIL // VM-017 — ELLSWORTH, T.</p>
       <div class="mHint">Press <b>ESC</b> to close</div>
     </div>
     <div class="letter" id="letterBody"></div>
+
+    <div class="revealBlock" id="revealBlock">
+      <div class="revealLabel">Photograph — Location Identified</div>
+      <div class="revealPhoto" id="revealPhoto">
+        <!--
+          REPLACE WITH YOUR LOCATION PHOTO:
+          <img src="your-photo.jpg" alt="Location" />
+        -->
+        [ REPLACE WITH LOCATION PHOTOGRAPH ]<br>
+        <span style="font-size:10px;opacity:0.6;">Set src= on the img tag above</span>
+      </div>
+      <div class="revealPhotoCaption">A physical slip of paper is hidden at this location.</div>
+
+      <div class="revealAudio">
+        <div class="revealAudioLabel">Voicemail Playback — VM-017</div>
+        <!--
+          REPLACE src="" WITH YOUR MP3 FILE:
+          e.g. src="ellsworth_voicemail.mp3"
+        -->
+        <audio id="vmAudio" controls src="" preload="auto"></audio>
+      </div>
+
+      <div class="slipNote">▸ NEXT STEP: Find the location shown above.
+  A slip of paper hidden there contains the code to the next puzzle.
+  Proceed to PUZZLE 4 // LOCKER 114.</div>
+    </div>
   </div>
 </div>
 
@@ -507,28 +606,7 @@ replace the empty file names when you add your own sounds.</p>
   let typing = false;
 
   const letterText =
-`To whoever made it this far—
-
-You cleared the noise.
-You held the signal.
-You stayed curious when it got uncomfortable.
-
-Congratulations.
-
-That rotary line wasn’t nostalgia.
-It was a test: can you translate the old world into the new one?
-
-You can.
-
-The puzzles are complete.
-The trail is yours now.
-
-If you ever feel watched:
-don’t run.
-don’t panic.
-just change the channel.
-
-— Professor V.`;
+'Someone answers. It’s faint, distorted, but definitely a human voice.\n\n';
 
   function openModal(){
     modalBack.style.display = "grid";
@@ -560,6 +638,19 @@ just change the channel.
         setTimeout(step, delay);
       } else {
         letterBody.appendChild(cursor);
+
+        // Reveal photo + audio after text finishes
+        const rb = document.getElementById("revealBlock");
+        rb.style.display = "block";
+
+        // Attempt autoplay (browser may block; controls still work)
+        const vm = document.getElementById("vmAudio");
+        if (vm && vm.src && !vm.src.endsWith("/")) {
+          const p = vm.play();
+          if (p && typeof p.catch === "function"){
+            p.catch(() => {});
+          }
+        }
       }
     }
     step();
